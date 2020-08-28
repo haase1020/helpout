@@ -8,28 +8,18 @@ import About from './components/pages/About';
 import { v4 as uuidv4 } from 'uuid';
 
 import './App.css';
+import axios from 'axios';
 
 class App extends Component {
   state = {
-    todos: [
-      {
-        id: uuidv4(),
-        title: 'Clean the kitchen',
-        completed: false,
-      },
-      {
-        id: uuidv4(),
-        title: 'Take out the garbage',
-        completed: false,
-      },
-      {
-        id: uuidv4(),
-        title: 'Clean the bathrooms',
-        completed: false,
-      },
-    ],
+    todos: [],
   };
 
+  componentDidMount() {
+    axios
+      .get('https://jsonplaceholder.typicode.com/todos?_limit=10')
+      .then((res) => this.setState({ todos: res.data }));
+  }
   //toggle complete
   markComplete = (id) => {
     this.setState({
@@ -44,19 +34,23 @@ class App extends Component {
 
   //delete todo
   delTodo = (id) => {
-    this.setState({
-      todos: [...this.state.todos.filter((todo) => todo.id !== id)],
-    });
+    axios
+      .delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
+      .then((res) =>
+        this.setState({
+          todos: [...this.state.todos.filter((todo) => todo.id !== id)],
+        })
+      );
   };
 
   // Add
   addTodo = (title) => {
-    const newTodo = {
-      id: uuidv4(),
-      title: title,
-      completed: false,
-    };
-    this.setState({ todos: [...this.state.todos, newTodo] });
+    axios
+      .post('https://jsonplaceholder.typicode.com/todos', {
+        title: title,
+        completed: false,
+      })
+      .then((res) => this.setState({ todos: [...this.state.todos, res.data] }));
   };
 
   render() {
